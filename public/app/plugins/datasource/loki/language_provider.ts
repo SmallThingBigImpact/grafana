@@ -484,6 +484,11 @@ export default class LokiLanguageProvider extends LanguageProvider {
         const res = await this.request(url, params);
         values = res.slice().sort();
         value = values;
+
+        for (var i = 0; i < value.length; i++) {
+          value[i] = value[i].replace(/\\\\/g, '\\').replace(/\\/g, '\\\\');
+        }
+
         this.labelsCache.set(cacheKey, value);
 
         this.logLabelOptions = this.addLabelValuesToOptions(key, values);
