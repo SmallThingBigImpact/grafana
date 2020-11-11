@@ -11,6 +11,10 @@ import { ThemeContext } from '../../themes/ThemeContext';
 import { CustomScrollbar } from '../CustomScrollbar/CustomScrollbar';
 import { List } from '../List/List';
 import { ClickOutsideWrapper } from '../ClickOutsideWrapper/ClickOutsideWrapper';
+import { CopyToClipboard } from 'app/core/components/CopyToClipboard/CopyToClipboard';
+import { AppEvents } from '@grafana/data';
+
+import appEvents from 'app/core/app_events';
 
 interface LogRowContextProps {
   row: LogRowModel;
@@ -102,6 +106,17 @@ const LogRowContextGroupHeader: React.FunctionComponent<LogRowContextGroupHeader
   const theme = useContext(ThemeContext);
   const { header } = getLogRowContextStyles(theme);
 
+  const getTextForClipboard = () => {
+    if (rows.length > 0) {
+      return rows.join('\r\n');
+    }
+    return 'nothing have copied';
+  };
+
+  const onClipboardSuccess = () => {
+    appEvents.emit(AppEvents.alertSuccess, ['Content copied to clipboard']);
+  };
+
   return (
     <div className={header}>
       <span
@@ -125,6 +140,19 @@ const LogRowContextGroupHeader: React.FunctionComponent<LogRowContextGroupHeader
           Load 10 more
         </span>
       )}
+      <span
+        className={css`
+          margin-left: 10px;
+          &:hover {
+            text-decoration: underline;
+            cursor: pointer;
+          }
+        `}
+      >
+        <CopyToClipboard text={getTextForClipboard} onSuccess={onClipboardSuccess} elType="div">
+          <span>Copy To Clipboard</span>
+        </CopyToClipboard>
+      </span>
     </div>
   );
 };
